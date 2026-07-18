@@ -143,24 +143,17 @@ async function processAll() {
         try {
             const arrayBuffer = await item.file.arrayBuffer();
 
-            console.log('Trying file:', item.file.name);
-            console.log('Password used:', password);
-
             // Step 1: Load with PDF.js using password
             const loadingTask = pdfjsLib.getDocument({
                 data: arrayBuffer,
                 password: password
             });
 
-            // Handle password prompt from PDF.js
             loadingTask.onPassword = (updatePassword, reason) => {
-                console.log('onPassword triggered, reason:', reason);
-                // reason 1 = need password, reason 2 = wrong password
                 updatePassword(password);
             };
 
             const pdfJsDoc = await loadingTask.promise;
-            console.log('PDF loaded OK, pages:', pdfJsDoc.numPages);
 
             // Step 2: Create new pdf-lib document
             const { PDFDocument } = PDFLib;
@@ -204,11 +197,6 @@ async function processAll() {
             results.push({ name: outName, url, status: 'success' });
 
         } catch (err) {
-            console.log('ERROR name:', err.name);
-            console.log('ERROR message:', err.message);
-            console.log('ERROR code:', err.code);
-            console.log('Full error:', err);
-
             let errMsg = '❌ Failed';
             const msg = err.message?.toLowerCase() || '';
             if (
