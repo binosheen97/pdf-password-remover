@@ -106,7 +106,7 @@ async function processAll() {
     const useSame = document.getElementById('same-password-checkbox').checked;
     const globalPw = document.getElementById('global-password').value;
 
-    // Validate passwords entered
+    // Validate passwords
     if (useSame && !globalPw.trim()) {
         showStatus('Please enter the password for all files.', 'error');
         return;
@@ -138,41 +138,74 @@ async function processAll() {
         const item = pdfFiles[i];
         const password = useSame ? globalPw : (document.getElementById(`pw-${i}`)?.value || '');
         btnText.textContent = `⏳ Processing ${i + 1} of ${pdfFiles.length}...`;
-
         updateBadge(i, 'processing', '⏳ Processing...');
 
         try {
             const arrayBuffer = await item.file.arrayBuffer();
 
-            // Step 1: Load with PDF.js to verify password
-            const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer, password: password });
-            await loadingTask.promise; // throws if wrong password
-
-            // Step 2: Load with pdf-lib and re-save without password
-            const { PDFDocument } = PDFLib;
-            const pdfDoc = await PDFDocument.load(arrayBuffer, {
-                password: password,
-                ignoreEncryption: false
+            // Step 1: Load with PDF.js using the password
+            const loadingTask = pdfjsLib.getDocument({
+                data: arrayBuffer,
+                password: password
             });
+            const pdfJsDoc = await loadingTask.promise;
+            const numPages = pdfJsDoc.numPages;
 
-            // Save without any encryption
-            const unlockedBytes = await pdfDoc.save();
+            // Step 2: Create new pdf-lib document
+            const { PDFDocument } = PDFLib;
+            const newPdf = await PDFDocument.create();
+
+            // Step 3: Render each page via canvas and embed as image
+            for (let p = 1; p <= numPages; p++) {
+                btnText.textContent = `⏳ File ${i + 1}/${pdfFiles.length} — Page ${p}/${numPages}...`;
+
+                const page = await pdfJsDoc.getPage(p);
+                const viewport = page.getViewport({ scale: 2.0 });
+
+                // Create offscreen canvas
+                const canvas = document.createElement('canvas');
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                const ctx = canvas.getContext('2d');
+
+                await page.render({ canvasContext: ctx, viewport }).promise;
+
+                // Convert canvas to PNG bytes
+                const imgDataUrl = canvas.toDataURL('image/png');
+                const imgBytes = await fetch(imgDataUrl).then(r => r.arrayBuffer());
+
+                // Embed image in pdf-lib
+                const pngImage = await newPdf.embedPng(imgBytes);
+                const pdfPage = newPdf.addPage([viewport.width / 2, viewport.height / 2]);
+                pdfPage.drawImage(pngImage, {
+                    x: 0,
+                    y: 0,
+                    width: viewport.width / 2,
+                    height: viewport.height / 2
+                });
+            }
+
+            // Step 4: Save unlocked PDF
+            const unlockedBytes = await newPdf.save();
             const blob = new Blob([unlockedBytes], { type: 'application/pdf' });
             const url = URL.createObjectURL(blob);
-            const outName = item.file.name.replace('.pdf', '_unlocked.pdf');
+            const outName = item.file.name.replace(/\.pdf$/i, '_unlocked.pdf');
 
             updateBadge(i, 'success', '✅ Unlocked');
             successCount++;
             results.push({ name: outName, url, status: 'success' });
 
         } catch (err) {
-            let errMsg = 'Failed';
-            if (err.message && err.message.toLowerCase().includes('password')) {
+            let errMsg = '❌ Failed';
+            const msg = err.message?.toLowerCase() || '';
+            if (
+                err.name === 'PasswordException' ||
+                msg.includes('password') ||
+                msg.includes('incorrect') ||
+                err.code === 1 ||
+                err.code === 2
+            ) {
                 errMsg = '❌ Wrong password';
-            } else if (err.name === 'PasswordException') {
-                errMsg = '❌ Wrong password';
-            } else {
-                errMsg = '❌ Failed';
             }
             updateBadge(i, 'error', errMsg);
             failCount++;
@@ -180,9 +213,7 @@ async function processAll() {
         }
     }
 
-    // Show results
     showResults(results, successCount, failCount);
-
     btn.disabled = false;
     btnText.textContent = '🔓 Remove Passwords';
 }
