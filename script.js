@@ -143,26 +143,36 @@ async function processAll() {
         try {
             const arrayBuffer = await item.file.arrayBuffer();
 
-            // Step 1: Load with PDF.js using the password
+            console.log('Trying file:', item.file.name);
+            console.log('Password used:', password);
+
+            // Step 1: Load with PDF.js using password
             const loadingTask = pdfjsLib.getDocument({
                 data: arrayBuffer,
                 password: password
             });
+
+            // Handle password prompt from PDF.js
+            loadingTask.onPassword = (updatePassword, reason) => {
+                console.log('onPassword triggered, reason:', reason);
+                // reason 1 = need password, reason 2 = wrong password
+                updatePassword(password);
+            };
+
             const pdfJsDoc = await loadingTask.promise;
-            const numPages = pdfJsDoc.numPages;
+            console.log('PDF loaded OK, pages:', pdfJsDoc.numPages);
 
             // Step 2: Create new pdf-lib document
             const { PDFDocument } = PDFLib;
             const newPdf = await PDFDocument.create();
 
-            // Step 3: Render each page via canvas and embed as image
-            for (let p = 1; p <= numPages; p++) {
-                btnText.textContent = `⏳ File ${i + 1}/${pdfFiles.length} — Page ${p}/${numPages}...`;
+            // Step 3: Render each page to canvas and embed as PNG
+            for (let p = 1; p <= pdfJsDoc.numPages; p++) {
+                btnText.textContent = `⏳ File ${i + 1}/${pdfFiles.length} — Page ${p}/${pdfJsDoc.numPages}...`;
 
                 const page = await pdfJsDoc.getPage(p);
                 const viewport = page.getViewport({ scale: 2.0 });
 
-                // Create offscreen canvas
                 const canvas = document.createElement('canvas');
                 canvas.width = viewport.width;
                 canvas.height = viewport.height;
@@ -170,11 +180,9 @@ async function processAll() {
 
                 await page.render({ canvasContext: ctx, viewport }).promise;
 
-                // Convert canvas to PNG bytes
                 const imgDataUrl = canvas.toDataURL('image/png');
                 const imgBytes = await fetch(imgDataUrl).then(r => r.arrayBuffer());
 
-                // Embed image in pdf-lib
                 const pngImage = await newPdf.embedPng(imgBytes);
                 const pdfPage = newPdf.addPage([viewport.width / 2, viewport.height / 2]);
                 pdfPage.drawImage(pngImage, {
@@ -196,6 +204,11 @@ async function processAll() {
             results.push({ name: outName, url, status: 'success' });
 
         } catch (err) {
+            console.log('ERROR name:', err.name);
+            console.log('ERROR message:', err.message);
+            console.log('ERROR code:', err.code);
+            console.log('Full error:', err);
+
             let errMsg = '❌ Failed';
             const msg = err.message?.toLowerCase() || '';
             if (
