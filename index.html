@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>PDF Password Remover - Remove PDF Password Online Free</title>
+    <meta name="description" content="Free online PDF password remover. Unlock password-protected PDF files instantly in your browser. Files never uploaded to any server. No registration required.">
+    <meta name="keywords" content="pdf password remover, remove pdf password, unlock pdf, pdf unlocker, remove pdf protection, decrypt pdf online free">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://binosheen97.github.io/pdf-password-remover/">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="PDF Password Remover - Unlock PDF Files Free">
+    <meta property="og:description" content="Remove passwords from PDF files instantly. Free, private, works in your browser.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://binosheen97.github.io/pdf-password-remover/">
+
+    <!-- Google Verification -->
+    <meta name="google-site-verification" content="cBtI9qnEEtgjEyN--AIkGKP__lNGdHbMJEZI72XqDSo" />
+    <meta name="google-adsense-account" content="ca-pub-9209701505864374">
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QV903LBHRQ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-QV903LBHRQ');
+    </script>
+
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9209701505864374" crossorigin="anonymous"></script>
+
+    <!-- PDF.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+    <!-- pdf-lib CDN -->
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔓 PDF Password Remover</h1>
+            <p class="subtitle">Remove PDF Passwords Instantly — Free & Private</p>
+            <div class="privacy-badge">🔒 Files stay on your device — never uploaded to any server</div>
+        </header>
+
+        <div class="main-layout">
+            <!-- Left Column -->
+            <div class="left-column">
+
+                <!-- Drop Zone -->
+                <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+                    <input type="file" id="file-input" accept=".pdf" multiple hidden onchange="handleFiles(this.files)">
+                    <div class="drop-icon">🔐</div>
+                    <div class="drop-title">Click to Select PDFs or Drag & Drop</div>
+                    <div class="drop-sub">Select one or multiple password-protected PDF files</div>
+                </div>
+
+                <!-- Options + File List Card -->
+                <div class="files-card" id="files-card" style="display:none">
+                    <div class="files-header">
+                        <h3>🔐 PDF Files</h3>
+                        <div class="files-actions">
+                            <button class="small-btn" onclick="document.getElementById('file-input').click()">+ Add More</button>
+                            <button class="small-btn danger" onclick="clearAll()">🗑️ Clear</button>
+                        </div>
+                    </div>
+
+                    <!-- Global Password Option -->
+                    <div class="global-password-box" id="global-password-box">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="same-password-checkbox" onchange="toggleGlobalPassword()">
+                            <span class="checkmark"></span>
+                            <span>Use same password for all PDFs</span>
+                        </label>
+                        <div class="global-input-wrap" id="global-input-wrap" style="display:none">
+                            <div class="password-field">
+                                <input type="password" id="global-password" placeholder="Enter password for all files" autocomplete="off">
+                                <button class="eye-btn" onclick="toggleVisibility('global-password', this)">👁️</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- File List -->
+                    <div id="file-list"></div>
+
+                    <!-- Process Button -->
+                    <div class="merge-section">
+                        <button class="merge-btn" id="process-btn" onclick="processAll()">
+                            <span id="process-btn-text">🔓 Remove Passwords</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Status Card -->
+                <div id="status-card" class="status-card" style="display:none"></div>
+
+                <!-- Results Card -->
+                <div id="results-card" class="results-card" style="display:none">
+                    <h3>✅ Unlocked Files</h3>
+                    <div id="results-list"></div>
+                </div>
+
+                <!-- Ad Unit -->
+                <div class="ad-container">
+                    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-9209701505864374" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+                    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="right-column">
+                <div class="how-card">
+                    <h3>📖 How to Remove PDF Password</h3>
+                    <div class="steps">
+                        <div class="step"><span class="step-num">1</span><span>Upload one or multiple password-protected PDFs</span></div>
+                        <div class="step"><span class="step-num">2</span><span>Choose: same password for all, or set individually</span></div>
+                        <div class="step"><span class="step-num">3</span><span>Enter the correct password(s)</span></div>
+                        <div class="step"><span class="step-num">4</span><span>Click "Remove Passwords"</span></div>
+                        <div class="step"><span class="step-num">5</span><span>Download your unlocked PDF files instantly!</span></div>
+                    </div>
+                </div>
+
+                <div class="privacy-card">
+                    <h3>🛡️ Your Privacy is Protected</h3>
+                    <ul>
+                        <li>✅ Everything runs in your browser</li>
+                        <li>✅ Files are never uploaded to any server</li>
+                        <li>✅ Passwords are never stored or transmitted</li>
+                        <li>✅ Works offline after page loads</li>
+                        <li>✅ No account or registration needed</li>
+                    </ul>
+                </div>
+
+                <div class="info-box-card">
+                    <h3>ℹ️ What This Tool Does</h3>
+                    <ul>
+                        <li>✅ Removes <strong>open/user password</strong> (password to open the file)</li>
+                        <li>✅ Removes <strong>owner/permissions password</strong> (restrictions on printing, copying)</li>
+                        <li>✅ Process multiple PDFs at once</li>
+                        <li>⚠️ You must know the current password</li>
+                        <li>❌ Cannot crack or brute-force unknown passwords</li>
+                    </ul>
+                </div>
+
+                <div class="other-tools-card">
+                    <h3>🔧 Other PDF Tools</h3>
+                    <div class="other-list">
+                        <a href="/pdf-merger/" class="other-item">📄 <span>PDF Merger — Combine files</span></a>
+                        <a href="/pdf-splitter/" class="other-item">✂️ <span>PDF Splitter — Extract pages</span></a>
+                        <a href="/images-to-pdf/" class="other-item">🖼️ <span>Images to PDF — Convert images</span></a>
+                        <a href="/pdf-rotate/" class="other-item">🔄 <span>PDF Rotate — Fix orientation</span></a>
+                        <a href="/pdf-compress/" class="other-item">🗜️ <span>PDF Compress — Reduce size</span></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Section -->
+        <div class="info-section">
+            <div class="info-card">
+                <h2>Why Remove PDF Password?</h2>
+                <p>PDF passwords can be inconvenient when you need to open, print, or share a document repeatedly. Removing the password creates an unlocked copy for easier access.</p>
+                <ul>
+                    <li>Open documents without entering password each time</li>
+                    <li>Print or copy content from restricted PDFs</li>
+                    <li>Share documents with colleagues easily</li>
+                    <li>Archive documents without access barriers</li>
+                </ul>
+            </div>
+            <div class="info-card">
+                <h2>Features</h2>
+                <ul>
+                    <li>Remove passwords from multiple PDFs at once</li>
+                    <li>Option to use same password for all files</li>
+                    <li>Set individual passwords per file</li>
+                    <li>Show/hide password toggle for easy entry</li>
+                    <li>Instant download of unlocked files</li>
+                    <li>Preserves original PDF quality and content</li>
+                </ul>
+            </div>
+            <div class="info-card">
+                <h2>Frequently Asked Questions</h2>
+                <ul>
+                    <li><strong>Is it really free?</strong> Yes, completely free forever.</li>
+                    <li><strong>Are my files safe?</strong> Yes! Files never leave your browser.</li>
+                    <li><strong>Can it crack passwords?</strong> No, you must know the password.</li>
+                    <li><strong>Does it work on mobile?</strong> Yes, works on all modern browsers.</li>
+                    <li><strong>What PDF types work?</strong> Any standard password-protected PDF.</li>
+                </ul>
+            </div>
+        </div>
+
+        <footer>
+            <p><strong>PDF Tools:</strong> <a href="/pdf-merger/">PDF Merger</a> | <a href="/pdf-splitter/">PDF Splitter</a> | <a href="/images-to-pdf/">Images to PDF</a> | <a href="/pdf-rotate/">PDF Rotate</a> | <a href="/pdf-compress/">PDF Compress</a> | <a href="/pdf-password-remover/">PDF Password Remover</a></p>
+            <p><strong>Calculators:</strong> <a href="/age-calculator/">Age</a> | <a href="/bmi-calculator/">BMI</a> | <a href="/loan-calculator/">Loan</a> | <a href="/mortgage-calculator/">Mortgage</a></p>
+            <p><a href="/">Home</a> | <a href="/about.html">About Us</a> | <a href="/privacy-policy.html">Privacy Policy</a> | <a href="/terms-of-service.html">Terms of Service</a></p>
+            <p>&copy; 2026 Free Online Tools. Free PDF password remover tool.</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
